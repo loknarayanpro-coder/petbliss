@@ -147,6 +147,24 @@ const DashboardLayout = () => {
                 ))}
               </nav>
             </div>
+            <div className="p-4 border-t border-gray-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary font-bold">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 text-gray-600 hover:text-red-600 px-3 py-2 rounded-lg transition-colors hover:bg-red-50"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="text-sm font-medium">Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

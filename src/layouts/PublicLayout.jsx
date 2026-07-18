@@ -161,10 +161,17 @@ const PublicLayout = () => {
               <div className="h-px bg-gray-200 my-4" />
               {user ? (
                 <>
+                  <div className="flex flex-col items-center mb-2">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xl mb-2">
+                      {user?.name?.charAt(0) || 'U'}
+                    </div>
+                    <span className="text-lg font-bold text-gray-900">{user?.name}</span>
+                    <span className="text-sm text-gray-500">{user?.email}</span>
+                  </div>
                   <Link
                     to={role === 'admin' ? '/admin' : '/dashboard'}
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-xl font-bold text-gray-800 hover:text-primary transition-colors"
+                    className="text-xl font-bold text-gray-800 hover:text-primary transition-colors mt-2"
                   >
                     Dashboard
                   </Link>
