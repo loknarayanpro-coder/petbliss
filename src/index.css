@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Palette Colors */
+  --color-marshmallow: #F4E2E1;
+  --color-sunflower: #F6CA3D;
+  --color-tangerine: #FC9008;
+  --color-moss-green: #334D42;
+  --color-milkshake: #F7C2BC;
+  --color-matcha: #D8E8C3;
+
+  /* Map to UI roles */
+  --color-primary: var(--color-tangerine);
+  --color-primary-dark: #E58207; /* Darker tangerine for hover */
+  --color-secondary: var(--color-sunflower);
+  --color-secondary-dark: #DEB637; /* Darker sunflower for hover */
+  --color-background: var(--color-marshmallow);
+  --color-surface: #FFFFFF;
+
+  /* Override Grays to use Moss Green tints to strictly enforce palette */
+  --color-gray-900: var(--color-moss-green);
+  --color-gray-800: #3E5E51;
+  --color-gray-700: #496F5F;
+  --color-gray-600: #54806E;
+  --color-gray-500: #6B9A86;
+  --color-gray-400: #88B2A1;
+  --color-gray-300: var(--color-matcha);
+  --color-gray-200: #E6F0D8;
+  --color-gray-100: #F3F8EC;
+  --color-gray-50: #F9FCF5;
+
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-gray-900 font-sans antialiased;
+    /* Optional: hide default cursor if fully committing to custom cursor
+       cursor: none; */
+  }
+}
+
+@layer utilities {
+  .blob-shape-1 {
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  }
+  .blob-shape-2 {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  .blob-shape-3 {
+    border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+  }
+  
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+  }
+}
