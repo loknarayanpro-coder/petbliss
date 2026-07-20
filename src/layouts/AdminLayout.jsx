@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Tag
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -30,6 +31,7 @@ const AdminLayout = () => {
     { name: 'Users', path: '/admin/users', icon: Users },
     { name: 'Pets', path: '/admin/pets', icon: PawPrint },
     { name: 'Appointments', path: '/admin/appointments', icon: Calendar },
+    { name: 'Offers', path: '/admin/offers', icon: Tag },
     { name: 'Events', path: '/admin/events', icon: FileText },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];

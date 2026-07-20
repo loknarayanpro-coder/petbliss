@@ -1,14 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Calendar, PawPrint, Clock, Activity } from 'lucide-react';
+import { supabase } from '../../lib/supabase/client';
 
 const UserDashboard = () => {
   const { user } = useAuth();
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.phone) {
+      fetchAppointments();
+    }
+  }, [user]);
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('phone', user.phone)
+        .order('booking_date', { ascending: true });
+
+      if (error) throw error;
+      setAppointments(data || []);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const upcomingAppts = appointments.filter(apt => new Date(apt.booking_date) >= new Date(new Date().setHours(0,0,0,0)));
+  const pastAppts = appointments.filter(apt => new Date(apt.booking_date) < new Date(new Date().setHours(0,0,0,0)));
 
   const stats = [
     { name: 'My Pets', value: '2', icon: PawPrint, color: 'text-primary', bg: 'bg-primary/10' },
-    { name: 'Upcoming Appts', value: '1', icon: Calendar, color: 'text-secondary', bg: 'bg-secondary/10' },
-    { name: 'Past Appts', value: '4', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-100' },
+    { name: 'Upcoming Appts', value: upcomingAppts.length.toString(), icon: Calendar, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { name: 'Past Appts', value: pastAppts.length.toString(), icon: Clock, color: 'text-blue-500', bg: 'bg-blue-100' },
   ];
 
   return (
@@ -43,20 +73,32 @@ const UserDashboard = () => {
             <button className="text-primary text-sm font-medium hover:underline">View All</button>
           </div>
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
-              <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm text-center">
-                <p className="text-xs text-gray-500 font-bold uppercase">Aug</p>
-                <p className="text-lg font-bold text-primary">24</p>
-              </div>
-              <div className="flex-1">
-                <h4 className="font-bold text-gray-900">Wellness Exam</h4>
-                <p className="text-sm text-gray-500">For Luna (Golden Retriever)</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-bold text-gray-900">10:00 AM</p>
-                <p className="text-xs text-gray-500">Dr. Smith</p>
-              </div>
-            </div>
+            {loading ? (
+              <p className="text-sm text-gray-500">Loading your appointments...</p>
+            ) : upcomingAppts.length === 0 ? (
+              <p className="text-sm text-gray-500">You have no upcoming appointments.</p>
+            ) : (
+              upcomingAppts.slice(0, 3).map((apt) => (
+                <div key={apt.id} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                  <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm text-center min-w-[4rem]">
+                    <p className="text-xs text-gray-500 font-bold uppercase">
+                      {new Date(apt.booking_date).toLocaleDateString(undefined, { month: 'short' })}
+                    </p>
+                    <p className="text-lg font-bold text-primary">
+                      {new Date(apt.booking_date).getDate()}
+                    </p>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900">{apt.yoga_service}</h4>
+                    <p className="text-sm text-gray-500">For {apt.pet_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-gray-900">{apt.booking_time}</p>
+                    <p className="text-xs text-gray-500 capitalize">{apt.payment_status}</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

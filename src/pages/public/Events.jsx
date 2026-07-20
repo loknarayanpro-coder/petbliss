@@ -5,10 +5,10 @@ import toast from 'react-hot-toast';
 
 const FadeIn = ({ children, delay = 0 }) => (
   <motion.div
-    initial={{ opacity: 0, x: -30 }}
-    whileInView={{ opacity: 1, x: 0 }}
+    initial={{ opacity: 0, x: -30, scale: 0.95 }}
+    whileInView={{ opacity: 1, x: 0, scale: 1 }}
     viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, delay }}
+    transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
   >
     {children}
   </motion.div>
@@ -74,11 +74,17 @@ const Events = () => {
               >
                 {/* Image Section - Landscape */}
                 <div className="relative w-full md:w-2/5 lg:w-1/3 h-64 md:h-auto overflow-hidden">
-                  <img 
-                    src={event.image} 
-                    alt={event.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                  />
+                  <motion.div
+                    animate={{ scale: [1, 1.03, 1], rotate: [0, 1, -1, 0] }}
+                    transition={{ duration: 7 + index * 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-full h-full"
+                  >
+                    <img 
+                      src={event.image} 
+                      alt={event.title} 
+                      className="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110" 
+                    />
+                  </motion.div>
                 </div>
                 
                 {/* Content Section */}

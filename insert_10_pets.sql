@@ -1,0 +1,12 @@
+INSERT INTO public.pets (name, breed, age, gender, weight, description, image_url, status)
+VALUES 
+('Bailey', 'Beagle', '2 Years', 'Male', '25 lbs', 'A curious and gentle beagle who loves sniffing around the yard and cuddling on the sofa.', 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?auto=format&fit=crop&q=80', 'Available'),
+('Oliver', 'Maine Coon', '3 Years', 'Male', '15 lbs', 'A majestic fluffball who enjoys napping in sunbeams and watching birds from the window.', 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&q=80', 'Available'),
+('Daisy', 'Poodle', '1 Year', 'Female', '12 lbs', 'Smart, energetic, and highly trainable. Daisy loves performing tricks for treats.', 'https://images.unsplash.com/photo-1589952283406-b53a7d1347e8?auto=format&fit=crop&q=80', 'Available'),
+('Leo', 'Bengal', '4 Years', 'Male', '10 lbs', 'An exotic-looking cat with endless energy. Leo loves climbing and interactive toys.', 'https://images.unsplash.com/photo-1606214174585-fd312384f59c?auto=format&fit=crop&q=80', 'Available'),
+('Max', 'German Shepherd', '5 Years', 'Male', '75 lbs', 'Loyal, protective, and a big softie at heart. Max is the ultimate family companion.', 'https://images.unsplash.com/photo-1589924691995-400dc9ce11ff?auto=format&fit=crop&q=80', 'Available'),
+('Chloe', 'Persian Cat', '2 Years', 'Female', '9 lbs', 'Quiet, affectionate, and perfectly happy spending her days lounging in laps.', 'https://images.unsplash.com/photo-1513245543132-31f507417b26?auto=format&fit=crop&q=80', 'Available'),
+('Charlie', 'Corgi', '1.5 Years', 'Male', '28 lbs', 'A spunky little guy with a huge personality and an adorable waddle.', 'https://images.unsplash.com/photo-1615056700511-b541315e13d9?auto=format&fit=crop&q=80', 'Available'),
+('Nala', 'Siamese', '6 Months', 'Female', '5 lbs', 'Vocal, playful, and very bonded to her humans. Nala loves to have "conversations".', 'https://images.unsplash.com/photo-1574144611937-0df059b5ef3e?auto=format&fit=crop&q=80', 'Available'),
+('Rocky', 'Husky Mix', '3 Years', 'Male', '55 lbs', 'Ready for adventure! Rocky needs an active family who loves hiking and the outdoors.', 'https://images.unsplash.com/photo-1605568420125-4596b6534960?auto=format&fit=crop&q=80', 'Available'),
+('Zoe', 'British Shorthair', '2 Years', 'Female', '11 lbs', 'A distinguished, calm lady who enjoys being near you but isn''t overly demanding.', 'https://images.unsplash.com/photo-1501820488136-72669149e0d4?auto=format&fit=crop&q=80', 'Available');

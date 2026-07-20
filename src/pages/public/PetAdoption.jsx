@@ -1,112 +1,277 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Filter, Search } from 'lucide-react';
+import { Heart, Search, Filter, Calendar, Activity, ChevronRight, X } from 'lucide-react';
+import { supabase } from '../../lib/supabase/client';
 import toast from 'react-hot-toast';
 
 const FadeIn = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ duration: 0.6, delay }}
+    viewport={{ once: true, margin: "-100px" }}
+    transition={{ duration: 0.8, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
   >
     {children}
   </motion.div>
 );
 
 const PetAdoption = () => {
-  const pets = [
-    { id: 1, name: 'Luna', species: 'Cat', breed: 'Persian', age: '2 Months', price: '₹12,000', image: '/adopt-cat.png' },
-    { id: 2, name: 'Max', species: 'Dog', breed: 'Golden Retriever', age: '3 Months', price: '₹25,000', image: '/adopt-dog.png' },
-    { id: 3, name: 'Bella', species: 'Dog', breed: 'Labrador', age: '4 Months', price: '₹18,000', image: '/adopt-dog.png' },
-    { id: 4, name: 'Oreo', species: 'Cat', breed: 'Scottish Fold', age: '1.5 Months', price: '₹22,000', image: '/adopt-cat.png' },
-    { id: 5, name: 'Thumper', species: 'Bunny', breed: 'Holland Lop', age: '2 Months', price: '₹4,500', image: '/adopt-bunny.png' },
-    { id: 6, name: 'Charlie', species: 'Dog', breed: 'Beagle', age: '5 Months', price: '₹20,000', image: '/adopt-dog.png' },
-    { id: 7, name: 'Simba', species: 'Cat', breed: 'Maine Coon', age: '3 Months', price: '₹30,000', image: '/adopt-cat.png' },
-    { id: 8, name: 'Daisy', species: 'Dog', breed: 'Shih Tzu', age: '2.5 Months', price: '₹28,000', image: '/adopt-dog.png' },
-    { id: 9, name: 'Snowball', species: 'Bunny', breed: 'Lionhead', age: '1 Month', price: '₹3,500', image: '/adopt-bunny.png' },
-    { id: 10, name: 'Rocky', species: 'Dog', breed: 'German Shepherd', age: '4 Months', price: '₹24,000', image: '/adopt-dog.png' },
-    { id: 11, name: 'Kiwi', species: 'Bird', breed: 'Parakeet', age: '6 Months', price: '₹1,500', image: '/adopt-bird.png' },
-    { id: 12, name: 'Peanut', species: 'Hamster', breed: 'Syrian Hamster', age: '1.5 Months', price: '₹800', image: '/adopt-hamster.png' },
-    { id: 13, name: 'Mango', species: 'Bird', breed: 'Cockatiel', age: '1 Year', price: '₹3,200', image: '/adopt-bird.png' },
-    { id: 14, name: 'Nibbles', species: 'Hamster', breed: 'Dwarf Hamster', age: '2 Months', price: '₹600', image: '/adopt-hamster.png' }
-  ];
+  const [filter, setFilter] = useState('All');
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPet, setSelectedPet] = useState(null);
+
+  useEffect(() => {
+    fetchPets();
+  }, []);
+
+  const fetchPets = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*')
+        .eq('status', 'Available')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setPets(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch pets:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = ['All', 'Dogs', 'Cats'];
+
+  // Basic client-side filtering based on breed/name as a simple heuristic
+  const filteredPets = pets.filter(pet => {
+    // Text search
+    if (searchTerm && !pet.name.toLowerCase().includes(searchTerm.toLowerCase()) && !pet.breed.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+    
+    // Category filter
+    if (filter === 'All') return true;
+    const isDog = pet.breed.toLowerCase().includes('dog') || pet.breed.toLowerCase().includes('retriever') || pet.breed.toLowerCase().includes('bulldog') || pet.breed.toLowerCase().includes('terrier');
+    const isCat = pet.breed.toLowerCase().includes('cat') || pet.breed.toLowerCase().includes('shorthair') || pet.breed.toLowerCase().includes('persian') || pet.breed.toLowerCase().includes('siamese');
+    
+    if (filter === 'Dogs') return isDog;
+    if (filter === 'Cats') return isCat;
+    return true;
+  });
 
   const handleAdopt = (petName) => {
     toast.success(`Request sent to meet ${petName}! We will contact you shortly.`);
+    setSelectedPet(null);
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 pt-24 pb-12 rounded-b-[4rem] shadow-sm mb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col bg-background min-h-screen pt-20 pb-32">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-primary/5 py-24 mb-16 rounded-b-[4rem]">
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-primary/20 blur-[100px] pointer-events-none mix-blend-multiply"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-secondary/20 blur-[80px] pointer-events-none mix-blend-multiply"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
             <motion.h1 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl sm:text-5xl font-black text-gray-900 mb-6"
+              className="text-5xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight"
             >
-              Meet Your <span className="text-primary italic font-serif">Soulmate</span>
+              Meet Your <span className="text-primary italic font-serif font-medium tracking-normal">Companion</span>
             </motion.h1>
-            <p className="text-xl text-gray-600 mb-10">
-              Ethically raised, healthy, and full of love. Discover our current furry friends waiting for their forever homes.
-            </p>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl text-gray-600 mb-10 leading-relaxed"
+            >
+              Open your heart and home to a furry companion. Every adoption includes a complimentary wellness check.
+            </motion.p>
             
-            {/* Search/Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
-              <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            {/* Search and Filter Bar */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white p-2 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 flex flex-col sm:flex-row max-w-2xl mx-auto"
+            >
+              <div className="flex-1 flex items-center px-6 py-3 sm:py-0 border-b sm:border-b-0 sm:border-r border-gray-100 relative">
+                <Search className="w-5 h-5 text-gray-400 mr-3" />
                 <input 
                   type="text" 
-                  placeholder="Search by breed or species..." 
-                  className="w-full bg-background border-2 border-transparent focus:border-primary rounded-full py-4 pl-12 pr-6 outline-none transition-all font-medium"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by name or breed..." 
+                  className="w-full focus:outline-none text-gray-700 bg-transparent font-medium"
                 />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm('')} className="absolute right-4">
+                    <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
               </div>
-              <button className="bg-gray-900 hover:bg-black text-white px-8 py-4 rounded-full font-bold flex items-center gap-2 transition-transform active:scale-95 whitespace-nowrap">
-                <Filter className="w-5 h-5" /> Filters
-              </button>
-            </div>
+              <div className="flex items-center px-4 py-2 gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setFilter(cat)}
+                    className={`px-6 py-3 rounded-full text-sm font-bold transition-all ${
+                      filter === cat 
+                        ? 'bg-gray-900 text-white shadow-md' 
+                        : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Pet Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {pets.map((pet, index) => (
-            <FadeIn key={pet.id} delay={(index % 4) * 0.1}>
-              <div className="bg-white rounded-[2rem] p-4 shadow-md hover:shadow-2xl border border-gray-100 transition-all group h-full flex flex-col">
-                <div className="relative aspect-square rounded-[1.5rem] overflow-hidden mb-6 bg-gray-100">
-                  <img src={pet.image} alt={pet.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full cursor-pointer hover:bg-primary hover:text-white transition-colors text-gray-400">
-                    <Heart className="w-5 h-5" />
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="flex justify-between items-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900">Available Companions ({filteredPets.length})</h2>
+          <button className="flex items-center gap-2 text-primary font-medium hover:text-primary-dark transition-colors">
+            <Filter className="w-5 h-5" /> More Filters
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+             <p className="font-medium">Fetching available pets...</p>
+          </div>
+        ) : filteredPets.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+            <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No pets found</h3>
+            <p className="text-gray-500">We couldn't find any pets matching your criteria right now. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPets.map((pet, index) => (
+              <FadeIn key={pet.id} delay={index * 0.1}>
+                <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_rgb(0,0,0,0.06)] border border-gray-100 group hover:-translate-y-2 transition-transform duration-500 flex flex-col h-full">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                    <img 
+                      src={pet.image_url} 
+                      alt={pet.name} 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-gray-900 uppercase tracking-widest shadow-sm">
+                      {pet.gender}
+                    </div>
+                    <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm">
+                      <Heart className="w-5 h-5" />
+                    </button>
                   </div>
-                  <div className="absolute bottom-4 left-4 bg-gray-900/80 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-bold">
-                    {pet.species}
+                  
+                  <div className="p-8 flex-1 flex flex-col">
+                    <div className="flex justify-between items-end mb-4">
+                      <div>
+                        <h3 className="text-3xl font-black text-gray-900 tracking-tight leading-none mb-1">{pet.name}</h3>
+                        <p className="text-gray-900 font-bold text-lg mb-2">{pet.price || '₹15,000'}</p>
+                        <p className="text-primary font-bold text-sm tracking-wide uppercase">{pet.breed}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <span className="flex items-center gap-1.5 bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium">
+                        <Calendar className="w-4 h-4 text-gray-400" /> {pet.age}
+                      </span>
+                      {pet.weight && (
+                        <span className="flex items-center gap-1.5 bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium">
+                          <Activity className="w-4 h-4 text-gray-400" /> {pet.weight}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {pet.description && (
+                      <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
+                        {pet.description}
+                      </p>
+                    )}
+
+                    <div className="mt-auto flex gap-3">
+                      <button 
+                        onClick={() => setSelectedPet(pet)}
+                        className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-white py-4 rounded-2xl font-bold transition-colors mt-auto flex items-center justify-center gap-2"
+                      >
+                        Choose Companion <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="px-2 flex-1 flex flex-col">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-black text-gray-900 group-hover:text-primary transition-colors">{pet.name}</h3>
-                    <span className="text-xl font-black text-secondary">{pet.price}</span>
-                  </div>
-                  <p className="text-gray-500 font-medium mb-1">{pet.breed}</p>
-                  <p className="text-sm text-gray-400 mb-6 flex-1">{pet.age} old</p>
-                  
-                  <button 
-                    onClick={() => handleAdopt(pet.name)}
-                    className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-white py-3.5 rounded-xl font-bold transition-colors mt-auto"
-                  >
-                    Choose {pet.name}
-                  </button>
+              </FadeIn>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Pet Details Modal */}
+      {selectedPet && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-white rounded-[2rem] shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row relative hide-scrollbar"
+          >
+            <button 
+              onClick={() => setSelectedPet(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="md:w-1/2 h-64 md:h-auto relative">
+              <img src={selectedPet.image_url} alt={selectedPet.name} className="w-full h-full object-cover" />
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-black text-gray-900 uppercase tracking-widest">
+                {selectedPet.gender}
+              </div>
+            </div>
+            
+            <div className="md:w-1/2 p-8 md:p-10 flex flex-col">
+              <h3 className="text-4xl font-black text-gray-900 tracking-tight leading-none mb-1">{selectedPet.name}</h3>
+              <p className="text-2xl font-bold text-gray-900 mb-2">{selectedPet.price || '₹15,000'}</p>
+              <p className="text-primary font-bold text-base tracking-wide uppercase mb-6">{selectedPet.breed}</p>
+              
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-gray-50 p-4 rounded-2xl">
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Age</p>
+                  <p className="font-bold text-gray-900">{selectedPet.age}</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-2xl">
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Weight</p>
+                  <p className="font-bold text-gray-900">{selectedPet.weight || 'N/A'}</p>
                 </div>
               </div>
-            </FadeIn>
-          ))}
+              
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 mb-2">About {selectedPet.name}</h4>
+                <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                  {selectedPet.description}
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => handleAdopt(selectedPet.name)}
+                className="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-2xl font-bold transition-colors mt-auto flex items-center justify-center gap-2 shadow-lg shadow-primary/30"
+              >
+                Confirm Adoption Request <Heart className="w-5 h-5 fill-white" />
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

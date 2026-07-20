@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Home as HomeIcon, Calendar, Heart, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom Interactive Cursor Component
@@ -55,6 +55,10 @@ const PublicLayout = () => {
     navigate('/');
   };
 
+  const handleNavClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
@@ -63,15 +67,15 @@ const PublicLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background relative selection:bg-primary selection:text-white">
+    <div className="min-h-screen flex flex-col bg-background relative selection:bg-primary selection:text-white pb-20 md:pb-0">
       <CustomCursor />
       
-      {/* Floating Pill Navigation */}
-      <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-        <nav className="pointer-events-auto bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-primary/5 rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl transition-all">
+      {/* Desktop Floating Pill Navigation */}
+      <div className="hidden md:flex fixed top-6 left-0 right-0 z-50 justify-center px-4 pointer-events-none">
+        <nav className="pointer-events-auto glass-premium border border-white/40 shadow-premium rounded-full px-6 py-3 flex items-center justify-between w-full max-w-5xl transition-all">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" onClick={handleNavClick} className="flex items-center gap-3 group">
             <div className="bg-primary/10 p-1.5 rounded-full group-hover:bg-primary/20 transition-colors">
               <img src="/logo.png" alt="PawBlissYoga" className="w-8 h-8 object-contain" />
             </div>
@@ -84,6 +88,7 @@ const PublicLayout = () => {
               <Link
                 key={link.name}
                 to={link.path}
+                onClick={handleNavClick}
                 className="text-gray-700 hover:text-gray-900 hover:bg-white/50 px-4 py-2 rounded-full font-semibold transition-all"
               >
                 {link.name}
@@ -97,6 +102,7 @@ const PublicLayout = () => {
               <>
                 <Link
                   to={role === 'admin' ? '/admin' : '/dashboard'}
+                  onClick={handleNavClick}
                   className="text-gray-700 hover:bg-white/50 px-4 py-2 rounded-full font-semibold transition-all"
                 >
                   Dashboard
@@ -112,12 +118,14 @@ const PublicLayout = () => {
               <>
                 <Link
                   to="/login"
+                  onClick={handleNavClick}
                   className="text-gray-700 hover:bg-white/50 px-4 py-2 rounded-full font-semibold transition-all"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
+                  onClick={handleNavClick}
                   className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-full font-bold transition-all shadow-lg shadow-primary/30"
                 >
                   Join
@@ -126,131 +134,106 @@ const PublicLayout = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center ml-auto">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-900 bg-white/50 p-2 rounded-full hover:bg-white transition-colors"
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+          {/* Remove mobile hamburger for desktop pill */}
         </nav>
       </div>
 
-      {/* Mobile Dropdown Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-24 left-4 right-4 z-40 bg-white/90 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-white/50 md:hidden"
-          >
-            <div className="flex flex-col space-y-4 text-center">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="text-xl font-bold text-gray-800 hover:text-primary transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ))}
-              <div className="h-px bg-gray-200 my-4" />
-              {user ? (
-                <>
-                  <div className="flex flex-col items-center mb-2">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xl mb-2">
-                      {user?.name?.charAt(0) || 'U'}
-                    </div>
-                    <span className="text-lg font-bold text-gray-900">{user?.name}</span>
-                    <span className="text-sm text-gray-500">{user?.email}</span>
-                  </div>
-                  <Link
-                    to={role === 'admin' ? '/admin' : '/dashboard'}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-xl font-bold text-gray-800 hover:text-primary transition-colors mt-2"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => { setIsMenuOpen(false); handleLogout(); }}
-                    className="bg-gray-900 text-white py-3 rounded-2xl font-bold text-lg mt-4"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-xl font-bold text-gray-800 hover:text-primary transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="bg-primary text-white py-3 rounded-2xl font-bold text-lg mt-4"
-                  >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile Top App Bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 glass-premium border-b border-gray-100/50 flex items-center justify-between px-4 h-16">
+        <Link to="/" onClick={handleNavClick} className="flex items-center gap-2">
+          <img src="/logo.png" alt="PawBlissYoga" className="w-8 h-8 object-contain" />
+          <span className="font-extrabold text-lg text-gray-900 tracking-tight">PawBlissYoga</span>
+        </Link>
+        <div className="flex items-center gap-3">
+          {user ? (
+            <Link to={role === 'admin' ? '/admin' : '/dashboard'} onClick={handleNavClick} className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+              {user?.name?.charAt(0) || 'U'}
+            </Link>
+          ) : (
+            <Link to="/login" onClick={handleNavClick} className="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Menu (Removed) */}
 
       {/* Main Content */}
-      <main className="flex-grow pt-32">
+      <main className="flex-grow pt-16 md:pt-32 pb-6 md:pb-0">
         <Outlet />
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 mt-auto rounded-t-[3rem] shadow-[0_-10px_40px_rgba(0,0,0,0.02)] relative z-10">
-        <div className="max-w-7xl mx-auto py-16 px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+      {/* Premium Dark Footer */}
+      <footer className="bg-gray-900 border-t border-gray-800 mt-auto relative z-10 pb-[env(safe-area-inset-bottom)] md:pb-0">
+        <div className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-1">
-              <Link to="/" className="flex items-center gap-3 mb-6">
+              <Link to="/" onClick={handleNavClick} className="flex items-center gap-3 mb-6">
                 <img src="/logo.png" alt="PawBlissYoga" className="w-12 h-12 object-contain" />
-                <span className="font-extrabold text-2xl text-gray-900">PawBlissYoga</span>
+                <span className="font-extrabold font-serif text-2xl text-white">PawBlissYoga</span>
               </Link>
-              <p className="text-gray-500 text-base leading-relaxed">
+              <p className="text-gray-400 text-base leading-relaxed">
                 Breathe Deep. Wag More. The ultimate destination for premium pet wellness and community.
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 tracking-widest uppercase mb-6">Explore</h3>
+              <h3 className="text-sm font-extrabold text-white tracking-widest uppercase mb-6">Explore</h3>
               <ul className="space-y-4">
-                <li><Link to="/about" className="text-gray-500 hover:text-primary font-medium transition-colors">About Us</Link></li>
-                <li><Link to="/services" className="text-gray-500 hover:text-primary font-medium transition-colors">Services</Link></li>
-                <li><Link to="/events" className="text-gray-500 hover:text-primary font-medium transition-colors">Events</Link></li>
+                <li><Link to="/about" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium transition-colors">About Us</Link></li>
+                <li><Link to="/services" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium transition-colors">Services</Link></li>
+                <li><Link to="/events" onClick={handleNavClick} className="text-gray-400 hover:text-white font-medium transition-colors">Events</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 tracking-widest uppercase mb-6">Legal</h3>
+              <h3 className="text-sm font-extrabold text-white tracking-widest uppercase mb-6">Legal</h3>
               <ul className="space-y-4">
-                <li><a href="#" className="text-gray-500 hover:text-primary font-medium transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-primary font-medium transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white font-medium transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white font-medium transition-colors">Terms of Service</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-gray-900 tracking-widest uppercase mb-6">Say Hello</h3>
+              <h3 className="text-sm font-extrabold text-white tracking-widest uppercase mb-6">Say Hello</h3>
               <ul className="space-y-4">
-                <li className="text-gray-500 font-medium">hello@pawblissyoga.com</li>
-                <li className="text-gray-500 font-medium">+1 (555) 123-4567</li>
+                <li className="text-gray-400 font-medium">hello@pawblissyoga.com</li>
+                <li className="text-gray-400 font-medium">+1 (555) 123-4567</li>
               </ul>
             </div>
           </div>
-          <div className="mt-16 border-t border-gray-100 pt-8 flex items-center justify-between">
-            <p className="text-gray-400 text-sm font-medium">&copy; {new Date().getFullYear()} PawBlissYoga. All rights reserved.</p>
+          <div className="mt-16 border-t border-gray-800 pt-8 flex items-center justify-between">
+            <p className="text-gray-500 text-sm font-medium">&copy; {new Date().getFullYear()} PawBlissYoga. All rights reserved.</p>
           </div>
         </div>
       </footer>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 glass-premium border-t border-gray-100/50 pb-[env(safe-area-inset-bottom)] z-50">
+        <div className="flex items-center justify-around h-16 px-2">
+          <Link to="/" onClick={handleNavClick} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary">
+            <HomeIcon className="w-6 h-6" />
+            <span className="text-[10px] font-semibold">Home</span>
+          </Link>
+          <Link to="/services" onClick={handleNavClick} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary">
+            <Heart className="w-6 h-6" />
+            <span className="text-[10px] font-semibold">Services</span>
+          </Link>
+          <Link to="/events" onClick={handleNavClick} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary">
+            <Calendar className="w-6 h-6" />
+            <span className="text-[10px] font-semibold">Events</span>
+          </Link>
+          {user ? (
+            <Link to={role === 'admin' ? '/admin' : '/dashboard'} onClick={handleNavClick} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary">
+              <LayoutDashboard className="w-6 h-6" />
+              <span className="text-[10px] font-semibold">Profile</span>
+            </Link>
+          ) : (
+            <Link to="/login" onClick={handleNavClick} className="flex flex-col items-center gap-1 text-gray-500 hover:text-primary">
+              <User className="w-6 h-6" />
+              <span className="text-[10px] font-semibold">Account</span>
+            </Link>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

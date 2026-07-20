@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -22,10 +23,15 @@ import PetAdoption from './pages/public/PetAdoption';
 // User Dashboard Pages
 import UserDashboard from './pages/user/UserDashboard';
 import UserPets from './pages/user/UserPets';
+import UserAppointments from './pages/user/UserAppointments';
+import UserSettings from './pages/user/UserSettings';
 
 // Admin Dashboard Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminOffers from './pages/admin/AdminOffers';
+import AdminAppointments from './pages/admin/AdminAppointments';
+import AdminPets from './pages/admin/AdminPets';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -71,6 +77,8 @@ const AppRoutes = () => {
       }>
         <Route index element={<UserDashboard />} />
         <Route path="pets" element={<UserPets />} />
+        <Route path="appointments" element={<UserAppointments />} />
+        <Route path="settings" element={<UserSettings />} />
       </Route>
 
       {/* Admin Dashboard Routes */}
@@ -81,6 +89,9 @@ const AppRoutes = () => {
       }>
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="appointments" element={<AdminAppointments />} />
+        <Route path="offers" element={<AdminOffers />} />
+        <Route path="pets" element={<AdminPets />} />
       </Route>
       
       {/* Catch All */}
@@ -89,10 +100,21 @@ const AppRoutes = () => {
   );
 };
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pathname]);
+
+  return null;
+};
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <AppRoutes />
         <Toaster position="top-right" />
       </Router>
